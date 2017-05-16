@@ -1,0 +1,77 @@
+Okay. So, I suck at documentation. But here we go. In this repository, we've got the following:
+
+auto-download.py =============> Simple python3 script that will download all COSMOS images necessary into current directory
+
+auto-download.ipynb ==========> IPython3 notebook version of the above
+
+proc-all.py ==================> Python3 file that takes an arbitrary number of COSMOS B and IB427 images in the same directory,
+				moves each tile into its own subdirectory, corrects a few weird things about each image, 
+				runs them through SExtractor, and outputs the following catalogs: B-band detected and measured, 
+				IB427 detected and measured, IB427 detected and B measured. Only the second and third catalogs 
+				are useful. NOTE: this wants a bunch of SExtractor files in the main folder, which it copies 
+				into each created subdirectory, modifies and uses. SExtractor here convolves with a 
+				10-pixel radius top hat filted. 10 pixels is 1.5" radius, or 3" diameter. 
+				Modify the main-branch sub_param.param to change the outputs of SExtractor
+				Once SExtractor has been run, this routine creates CMDs in each created subdirectory, 
+				finds IB427-overbright sources, and spits out some DS9 region files. 
+				One for a constant IB-excess of -0.1, one for a 3-sigma excess (which image artifacts make not great).
+				It also creates a total CMD for the entire field, but does nothing with it.
+
+				This takes a good ~20 - 30 minutes to run for all images. It would be shorter, but I screwed something
+				up, and it keeps trying to run SExtractor on non-existant files. Doesn't affect anything in the end, but
+				wastes a fair bit of time. I know. My coding practices are poor.
+
+From here, we can simply sort through all ~100 subdirectories in DS9 and sight-check for blob-ey looking things. This is where I'm at.
+It would probabaly be trivial to sort this down even further in the CMD portion of the routine, but you'll just end up checking by eye
+anyway.
+
+initial_detection.ipynb ======> IPython3 notebook version of the above.
+
+filter_files.ipynb ===========> IPython3 notebook that creates custom Top Hat and Gaussian filters at a given radius for use in SExtractor.
+
+kernel_density_code.ipynb ====> Okay. I'm still not sure what a kernal density map really is, but this is some sample code to make one.
+				I got it running once on a CMD, but it wasn't super enlightening. In essence, it creates number density contours.
+				Could be useful.
+
+THE FOLLOWING ROUTINES ARE INCLUDED IN proc-all.py, AND ARE DEPRECATED
+But in case you want to see the bits and pieces....
+
+
+CMD_2.ipynb ==================> Creates CMDs for a bunch of subdirectories, after proc-all.py has been run. Makes region files.
+				All functions in this notebook have been included in proc-all.py.
+
+bad-pixel-replace.ipynb ======> COSMOS replaced all their overflow pixels with NaN. SExtractor doesn't like NaN. This routine is like, two lines
+				and replaces all instances of NaN in a given fits file with the value 65535, the traditional CCD overflow value
+				At least, the one I'm most familier with being 2^2^2^2. proc-all.py does this on the fly. Cause its seriously like,
+				two lines. And one is an import statement. God, I love python.
+
+SEXTRACTOR FILES/DEPENDANCIES FOR proc-all.py
+
+default.nnw ==================> SExtractor default neural network weighting. I just kinda let this one be....
+
+default.psf ==================> Point spread function. Probably a better one out there somewhere.
+
+default_b.sex ================> Template file proc-all.py modifies and feeds into SExtractor to make a catalog for B-detected and measured.
+
+default_comb.sex =============> Template file proc-all.py modifies and feeds into SExtractor to make a catalog for IB427-detected B-measured.
+
+default_ib.sex ===============> Template file proc-all.py modifies and feeds into SExtractor to make a catalog for IB427-detected and measured.
+
+Modify the contents of the three default_*.sex files to modify SExtractor parameters when proc-all.py is run. E.g., if you want a different filter.
+
+sub_param.param ==============> Param file for SExtractor. proc-all.py will copy this unmodified into each subdirectory. Modifying will modify
+				param inputs for all SExtractor runs.
+
+gauss_FWHM5_dim17.conv =======> 17x17 Gaussian filter with FWHM of 5 pix
+
+gauss_FWHM2_dim11.conv =======> 11x11 Gaussian filter with FWHM of 2 pix
+
+top_hat_5pix.conv ============> 5 pixel-radius Top Hat filter.
+
+top_hat_8pix.conv ============> 8 pixel-radius Top Hat filter.
+
+top_hat_10pix.conv ===========> 10 pixel-radius Top Hat filter. SExtractor templates set up for this one.
+
+Anyway, I think that's about it. The code is pretty simple, but rough and uncommented for the most part. It should be fairly easy to tweak a bit.
+But it currently is set up such that it just wants you to dump all these files in one subdirectory by themselves, and run auto-download.py, followed
+by proc-all.py. Doing anything else breaks everything. See above about poor coding practices. Sorry, Moire/Agnar/whichever poor student looks at this.

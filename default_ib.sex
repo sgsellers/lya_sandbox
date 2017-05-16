@@ -35,7 +35,7 @@ PHOT_PETROPARAMS 2.0, 4       # MAG_PETRO parameters: <Petrosian_fact>,
  
 SATUR_LEVEL      50000.0        # level (in ADUs) at which arises saturation
  
-MAG_ZEROPOINT    22.673            # magnitude zero-point
+MAG_ZEROPOINT    31.4            # magnitude zero-point
 MAG_GAMMA        4.0            # gamma of emulsion (for photographic scans)
 GAIN             0.0            # detector gain in e-/ADU
 PIXEL_SCALE      0            # size of pixel in arcsec (0=use FITS WCS info)
